@@ -14,3 +14,10 @@ if __name__ == '__main__':
 # run ocr function to parse date_price value pair in json txt
 	for image_file in image_file_list:
 		ocr.ocr_fun(image_file)
+
+	file_to_load = json.loads(glob.glob("*.txt"))
+
+	with open ("ocr_csv.csv", 'w') as file_to_write:
+		csv_writer = csv.writer(file_to_write)
+		for key in file_to_load:
+			csv_writer.writerow(key.values())
