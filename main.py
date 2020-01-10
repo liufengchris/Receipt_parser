@@ -2,6 +2,7 @@ import csv
 import glob
 import sys
 import ocr
+import pandas as pd
 
 if __name__ == '__main__':
 
@@ -14,10 +15,9 @@ if __name__ == '__main__':
 	ocr_dict = dict()
 	for image_file in image_file_list:
 		ocr_dict.update(ocr.ocr_fun(image_file))
-		
-	print(ocr_dict)
 
-	with open('ocr_csv.csv', 'w') as file_to_write:
-		dict_writer = csv.DictWriter(file_to_write, ocr_dict.keys())
-		dict_writer.writeheader()
-		#dict_writer.writerows(ocr_dict)
+# convert the ocr_dict into pandas dataframe with index as orientation
+	ocr_df = pd.DataFrame.from_dict(ocr_dict, orient='index')
+
+# convert datafram into csv file
+	ocr_df.to_csv('ocr.csv')

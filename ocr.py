@@ -36,40 +36,43 @@ def ocr_fun(image_file):
 	# user rergex to find the booking reference
 	bookingref_pattern = "[\w]{3}\-[\d]{7}\-[\d]\-[\d]{3}"
 
-	bookingref = re.search(bookingref_pattern, ocr_text)
-	if bookingref:
-		print(bookingref.group(0))
+	bookingref_obj = re.search(bookingref_pattern, ocr_text)
+	if bookingref_obj:
+		bookingref = bookingref_obj.group(0)
 	else:
-		print("no ref")
+		bookingref = "no ref"
 
 	# use regex to find the date
+	# 1st pattern to match Grab receipt date format
 	date_pattern_DDMMMYY = "[\d]{1,2} [ADFJMNOS]\w* [\d]{2}"
+	# 2nd pattern 
 	date_pattern_DDMMMYYYY = "[\d]{1,2} [ADFJMNOS]\w* [\d]{4}"
 
 	date_DDMMMYY = re.search(date_pattern_DDMMMYY, ocr_text)
 	if date_DDMMMYY:
 	# convert the string into standard datetime object
 		date_formatted = datetime.strptime(date_DDMMMYY.group(0), '%d %b %y')
-		print (date_formatted.date())
+		date_dict = {'date': str(date_formatted.date())}
 	else:
-		print("no date!")
-
+		date_dict = {'date': 'no date!'}
 
 	# use regex to find the price
 	price_pattern = "[\d]{1,2}\.[\d]{2}"
 
 	prices = re.findall(price_pattern, ocr_text)
 	if prices:
-		print (max(prices))
+		price_dict = {'price': max(prices)}
 	else:
-		print("no price!")
+		price_dict = {'price': 'no price!'}
 
-	# store the value pair in json format file
-	date_price_tuple = (str(date_formatted.date()), max(prices))
+	# store two dicts into 3rd dict using ** trick
+	date_price_dict = {**date_dict, **price_dict}
+	# if I want I can aggregate data into json file
+	'''
 	with open('ocr_text_json.json', 'a') as file_to_write:
-			json.dump(date_price_tuple, file_to_write)
-
-	data_dict = {bookingref.group(0):date_price_tuple}
+			json.dump(date_price_dict, file_to_write)
+	'''
+	data_dict = {bookingref:date_price_dict}
 
 	return data_dict
 
