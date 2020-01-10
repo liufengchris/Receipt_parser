@@ -33,7 +33,14 @@ def ocr_fun(image_file):
 	os.remove(filename)
 
 	# set a dict object to return
+	# user rergex to find the booking reference
+	bookingref_pattern = "[\w]{3}\-[\d]{7}\-[\d]\-[\d]{3}"
 
+	bookingref = re.search(bookingref_pattern, ocr_text)
+	if bookingref:
+		print(bookingref.group(0))
+	else:
+		print("no ref")
 
 	# use regex to find the date
 	date_pattern_DDMMMYY = "[\d]{1,2} [ADFJMNOS]\w* [\d]{2}"
@@ -58,11 +65,13 @@ def ocr_fun(image_file):
 		print("no price!")
 
 	# store the value pair in json format file
-	date_price_dict = {str(date_formatted.date()):max(prices)}
-	with open('ocr_text_json.txt', 'a') as file_to_write:
-			json.dump(date_price_dict, file_to_write)
+	date_price_tuple = (str(date_formatted.date()), max(prices))
+	with open('ocr_text_json.json', 'a') as file_to_write:
+			json.dump(date_price_tuple, file_to_write)
 
-	return date_price_dict
+	data_dict = {bookingref.group(0):date_price_tuple}
+
+	return data_dict
 
 if __name__ == '__main__':
 	receipt_dict = ocr_fun()
